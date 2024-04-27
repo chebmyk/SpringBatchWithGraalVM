@@ -4,5 +4,9 @@ import lombok.Data;
 
 @Data
 public class ProcessItem {
-    String value;
+    String value="";
+
+    public String showValue() {
+        return value;
+    }
 }

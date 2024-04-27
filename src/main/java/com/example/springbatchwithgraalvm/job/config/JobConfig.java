@@ -5,6 +5,9 @@ import com.example.springbatchwithgraalvm.model.UserDto;
 import com.example.springbatchwithgraalvm.model.Users;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.aot.hint.ExecutableMode;
+import org.springframework.aot.hint.RuntimeHints;
+import org.springframework.aot.hint.RuntimeHintsRegistrar;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -23,11 +26,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportRuntimeHints;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 
 import java.io.IOException;
 
@@ -67,17 +73,20 @@ public class JobConfig {
         return new UsersItemWriter(usersRepository);
     }
 
-    @Bean
-    @StepScope
-    public Resource getInputCsvFile(@Value("#{jobParameters['inputFile']}") String filePath) {
-        Assert.notNull(filePath, "Job Parameter inputCsv is missing");
-        return resourceLoader.getResource(filePath);
-    }
+//    @Bean
+//    public Resource getInputCsvFile(@Value("#{jobParameters['inputFile']}") {
+//        Assert.notNull(filePath, "Job Parameter inputCsv is missing");
+//        if (filePath == null) {
+//            filePath="users.csv";
+//        }
+//        return resourceLoader.getResource(filePath);
+//    }
 
 
     @Bean
     @StepScope
-    public FlatFileItemReader<UserDto> flatFileItemReader(Resource file) throws IOException {
+    public FlatFileItemReader<UserDto> flatFileItemReader() throws IOException {
+        Resource file = new ClassPathResource("users.csv");
         log.info("+++Input file {}", file);
         val flatFileItemReader = new FlatFileItemReader<UserDto>();
         flatFileItemReader.setName("VISITORS_READER");
@@ -104,8 +113,13 @@ public class JobConfig {
 Workaround for issue https://github.com/spring-projects/spring-batch/issues/4519
 Should be fixed in SpringBatch 5.2
 */
-    @Bean
-    public static BeanDefinitionRegistryPostProcessor jobRegistryBeanPostProcessorRemover() {
-        return registry -> registry.removeBeanDefinition("jobRegistryBeanPostProcessor");
-    }
+//    @Bean
+//    public static BeanDefinitionRegistryPostProcessor jobRegistryBeanPostProcessorRemover() {
+//        return registry -> registry.removeBeanDefinition("jobRegistryBeanPostProcessor");
+//    }
+
+
+
+
+
 }
